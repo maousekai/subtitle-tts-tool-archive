@@ -1,0 +1,117 @@
+{
+  "snapshot_date": "2026-10-21",
+  "files": [
+    {
+      "project": "P098",
+      "file": "app/implementation_plan.md",
+      "original_sha256": "913c18c5d8f9ebbf194b9e2d805f40f5216d156bfe705b456e9f72c004733fa8",
+      "archived_sha256": "913c18c5d8f9ebbf194b9e2d805f40f5216d156bfe705b456e9f72c004733fa8",
+      "bytes": 9285,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/index.html",
+      "original_sha256": "0b5dad92bf29122fc097c333ffee15e062f1f8e72adbae10c577a666d83d3e3c",
+      "archived_sha256": "0b5dad92bf29122fc097c333ffee15e062f1f8e72adbae10c577a666d83d3e3c",
+      "bytes": 26822,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/styles.css",
+      "original_sha256": "66ab8b11459b53de39d4c90b4faa9c9447e58bb6a9aa31268c992b4c4c199c54",
+      "archived_sha256": "66ab8b11459b53de39d4c90b4faa9c9447e58bb6a9aa31268c992b4c4c199c54",
+      "bytes": 24967,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/js/app.js",
+      "original_sha256": "7193adc0780b0d030593ec8b5cbb808406a6e72f4082ea3bcf61c509f4601aee",
+      "archived_sha256": "7193adc0780b0d030593ec8b5cbb808406a6e72f4082ea3bcf61c509f4601aee",
+      "bytes": 68609,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/js/audio-merger.js",
+      "original_sha256": "0b62119ecf11895ef32a2f91e638bb033ce2d934252cbd11f8a451116b4dc0a9",
+      "archived_sha256": "0b62119ecf11895ef32a2f91e638bb033ce2d934252cbd11f8a451116b4dc0a9",
+      "bytes": 8304,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/js/batch-processor.js",
+      "original_sha256": "b0bdecbcea18e2b8c53d44b0a102612ff50f9e9596beff776855faf8aa1de2d1",
+      "archived_sha256": "b0bdecbcea18e2b8c53d44b0a102612ff50f9e9596beff776855faf8aa1de2d1",
+      "bytes": 9211,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/js/cache-manager.js",
+      "original_sha256": "807916bc951549a462e0225d9833d7d0cdfa1f73a1aaab34aea9e7086c91c65a",
+      "archived_sha256": "807916bc951549a462e0225d9833d7d0cdfa1f73a1aaab34aea9e7086c91c65a",
+      "bytes": 6437,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/js/elevenlabs-api.js",
+      "original_sha256": "7ce04344feae8dd9697eec3918f35d734ad3bce4ad3b45955cce059397ecc187",
+      "archived_sha256": "7ce04344feae8dd9697eec3918f35d734ad3bce4ad3b45955cce059397ecc187",
+      "bytes": 6891,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/js/fallback-tts.js",
+      "original_sha256": "7e8f823fc3f93868417690490450aad7ec7d99e087cd6dbf9085ae933fe28c77",
+      "archived_sha256": "7e8f823fc3f93868417690490450aad7ec7d99e087cd6dbf9085ae933fe28c77",
+      "bytes": 4191,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/js/google-tts-api.js",
+      "original_sha256": "6bf570ec8804c9ad19bbed5079763d02798e7a82665cff101f237ca6a7bd4a1b",
+      "archived_sha256": "6bf570ec8804c9ad19bbed5079763d02798e7a82665cff101f237ca6a7bd4a1b",
+      "bytes": 3903,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/js/image-generator.js",
+      "original_sha256": "c478b5184c69fa37f4605ee20c392a24799b03293a316506a8447c380310846f",
+      "archived_sha256": "c478b5184c69fa37f4605ee20c392a24799b03293a316506a8447c380310846f",
+      "bytes": 3077,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/js/subtitle-parser.js",
+      "original_sha256": "b67b23292d9dce47a17f219a5d5ba62312d5930ea0891bed6d3316efc83329f3",
+      "archived_sha256": "b67b23292d9dce47a17f219a5d5ba62312d5930ea0891bed6d3316efc83329f3",
+      "bytes": 9940,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/js/text-optimizer.js",
+      "original_sha256": "8671284250e939ac0c81de8bd2d0387be22f119e6bcd77775085b6c63b9c0b9e",
+      "archived_sha256": "8671284250e939ac0c81de8bd2d0387be22f119e6bcd77775085b6c63b9c0b9e",
+      "bytes": 5864,
+      "transformations": []
+    },
+    {
+      "project": "P098",
+      "file": "app/js/video-renderer.js",
+      "original_sha256": "4039dfaba26f6530fa99f8db851470c4e6147922de27fa9f6afde89facc796de",
+      "archived_sha256": "4039dfaba26f6530fa99f8db851470c4e6147922de27fa9f6afde89facc796de",
+      "bytes": 4509,
+      "transformations": []
+    }
+  ]
+}

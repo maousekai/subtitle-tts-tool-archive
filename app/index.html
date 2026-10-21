@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="ElevenLabs Text-to-Speech Tool - Công cụ chuyển văn bản thành giọng đọc với tối ưu token">
+    <title>ElevenLabs TTS Tool</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
+</head>
+
+<body>
+    <!-- ============ Toast Container ============ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============ Header ============ -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo">🎙️</div>
+            <div>
+                <div class="header-title">ElevenLabs TTS Tool</div>
+                <div class="header-subtitle">Text-to-Speech với tối ưu token</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="credits-badge" id="creditsBadge" title="Click để xem chi tiết credits">
+                <span>💰</span>
+                <span id="creditsText">Chưa kết nối</span>
+            </div>
+            <button class="btn" id="btnApiKey" title="Cấu hình API Key">
+                🔑 API Key
+            </button>
+        </div>
+    </header>
+
+    <!-- ============ Main Container ============ -->
+    <main class="app-container">
+        <!-- ============ Tab Switcher ============ -->
+        <div class="tabs-container glass" style="grid-column: 1 / -1; display: flex; gap: 10px; padding: 10px 16px;">
+            <button class="btn btn-primary" id="btnTabAudio" style="flex:1; justify-content:center; font-size: 1rem;">🎵
+                Pha 1: Tạo Âm thanh</button>
+            <button class="btn" id="btnTabVideo"
+                style="flex:1; justify-content:center; font-size: 1rem; background:var(--bg-glass); box-shadow:none;">🎥
+                Pha 2: Tạo Video</button>
+        </div>
+
+        <!-- ============ PHASE 1: AUDIO ============ -->
+        <div id="viewAudio" style="display: contents;">
+
+            <!-- ============ Import Panel ============ -->
+            <section class="import-panel glass" id="importPanel">
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btnImportFile">
+                        📄 Import File
+                    </button>
+                    <button class="btn" id="btnImportFolder">
+                        📁 Import Folder
+                    </button>
+                    <button class="btn" id="btnAddText">
+                        ✏️ Nhập Text
+                    </button>
+                </div>
+
+                <div class="batch-stats" id="batchStats">
+                    <div class="stat-item">
+                        Done: <span class="stat-value done" id="statDone">0</span>
+                    </div>
+                    <div class="stat-item">
+                        Processing: <span class="stat-value processing" id="statProcessing">0</span>
+                    </div>
+                    <div class="stat-item">
+                        Total: <span class="stat-value" id="statTotal">0</span>
+                    </div>
+                    <div class="stat-item">
+                        Elapsed: <span class="stat-value" id="statElapsed">0:00</span>
+                    </div>
+                </div>
+
+                <div class="batch-controls">
+                    <button class="btn btn-success" id="btnStart" disabled>
+                        ▶ Start
+                    </button>
+                    <button class="btn btn-warning" id="btnPause" disabled>
+                        ⏸ Pause
+                    </button>
+                    <button class="btn btn-danger" id="btnStop" disabled>
+                        ⏹ Stop
+                    </button>
+                </div>
+
+                <!-- Hidden file inputs -->
+                <input type="file" id="fileInput" class="hidden-input" accept=".srt,.txt,.ass,.ssa,.vtt" multiple>
+                <input type="file" id="folderInput" class="hidden-input" webkitdirectory directory multiple>
+            </section>
+
+            <!-- Batch progress bar -->
+            <div class="batch-progress" style="grid-column: 1 / -1; margin-top: -12px;">
+                <div class="batch-progress-fill" id="batchProgressFill"></div>
+            </div>
+
+            <!-- ============ Subtitle List Panel ============ -->
+            <section class="subtitle-panel glass drop-zone" id="subtitlePanel">
+                <div class="panel-header">
+                    <h3>
+                        📋 Danh sách Subtitle
+                        <span class="subtitle-count" id="subtitleCount">0</span>
+                    </h3>
+                    <div>
+                        <button class="btn btn-sm" id="btnClearList" title="Xóa tất cả">
+                            🗑️ Xóa
+                        </button>
+                    </div>
+                </div>
+                <div class="subtitle-list" id="subtitleList">
+                    <!-- Empty state -->
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon">📂</div>
+                        <h4>Chưa có subtitle nào</h4>
+                        <p>Import file SRT/TXT/ASS/VTT hoặc kéo thả file vào đây để bắt đầu</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ Voice Settings Panel ============ -->
+            <section class="settings-panel glass" id="settingsPanel">
+                <div class="panel-header">
+                    <h3>⚙️ Voice Settings</h3>
+                </div>
+                <div class="settings-content">
+
+                    <!-- Provider Selection -->
+                    <div class="form-group">
+                        <label>Nhà cung cấp TTS</label>
+                        <select class="form-select" id="ttsProviderSelect" style="margin-bottom: 12px;">
+                            <option value="elevenlabs">ElevenLabs</option>
+                            <option value="google">Google Cloud TTS (Miễn phí 1M chars)</option>
+                        </select>
+                    </div>
+
+                    <!-- Voice Selection -->
+                    <div class="form-group">
+                        <label>Voice</label>
+                        <input type="text" class="form-input" id="voiceSearch" placeholder="🔍 Tìm voice..."
+                            style="margin-bottom:6px; padding:7px 12px; font-size:0.8rem;">
+                        <select class="form-select" id="voiceSelect" size="1">
+                            <option value="sB7vwSCyX0tQmU24cW2C">Default Voice</option>
+                        </select>
+                        <div class="voice-preview" id="voicePreview">
+                            <div class="voice-avatar">🎤</div>
+                            <div class="voice-info">
+                                <div class="voice-name" id="voiceName">Chưa chọn voice</div>
+                                <div class="voice-desc" id="voiceDesc">Nhấn 🔑 API Key để kết nối</div>
+                            </div>
+                            <button class="btn btn-sm btn-primary" id="btnTestVoice" title="Test giọng đọc">
+                                🔊 Test
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Voice ID -->
+                    <div class="form-group">
+                        <label>
+                            Voice ID thủ công
+                            <span style="font-size:0.65rem; color:var(--text-muted);">(nếu không tìm thấy voice)</span>
+                        </label>
+                        <div style="display:flex; gap:6px;">
+                            <input type="text" class="form-input" id="customVoiceId"
+                                placeholder="Dán Voice ID vào đây..." value="sB7vwSCyX0tQmU24cW2C"
+                                style="flex:1; padding:7px 10px; font-size:0.8rem;">
+                            <button class="btn btn-sm" id="btnUseCustomVoice" title="Sử dụng Voice ID này">
+                                ✅ Dùng
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Test Voice Text -->
+                    <div class="form-group" id="testVoiceGroup">
+                        <label>Văn bản test voice</label>
+                        <div style="display:flex; gap:6px;">
+                            <input type="text" class="form-input" id="testVoiceText"
+                                value="Xin chào, đây là giọng đọc thử nghiệm."
+                                style="flex:1; padding:7px 10px; font-size:0.8rem;">
+                            <button class="btn btn-sm btn-primary" id="btnTestVoice2" title="Test giọng đọc">
+                                🔊 Nghe
+                            </button>
+                        </div>
+                        <div id="testVoiceStatus" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Model Selection -->
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select class="form-select" id="modelSelect">
+                            <option value="eleven_flash_v2_5">⚡ Flash v2.5 (Nhanh, tiết kiệm 2x)</option>
+                            <option value="eleven_multilingual_v2">🌍 Multilingual v2 (Chất lượng cao)</option>
+                            <option value="eleven_v3">✨ v3 (Biểu cảm nhất)</option>
+                            <option value="eleven_flash_v2">⚡ Flash v2 (English, siêu nhanh)</option>
+                        </select>
+                    </div>
+
+                    <div class="divider"></div>
+                    <div class="section-title">Cài đặt giọng đọc</div>
+
+                    <!-- Speed -->
+                    <div class="form-group">
+                        <label>
+                            Speed
+                            <span class="label-value" id="speedValue">1.0x</span>
+                        </label>
+                        <input type="range" class="range-slider" id="speedSlider" min="0.5" max="2.0" step="0.05"
+                            value="1.0">
+                    </div>
+
+                    <!-- Stability -->
+                    <div class="form-group">
+                        <label>
+                            Stability
+                            <span class="label-value" id="stabilityValue">50%</span>
+                        </label>
+                        <input type="range" class="range-slider" id="stabilitySlider" min="0" max="1" step="0.01"
+                            value="0.5">
+                    </div>
+
+                    <!-- Similarity -->
+                    <div class="form-group">
+                        <label>
+                            Similarity
+                            <span class="label-value" id="similarityValue">75%</span>
+                        </label>
+                        <input type="range" class="range-slider" id="similaritySlider" min="0" max="1" step="0.01"
+                            value="0.75">
+                    </div>
+
+                    <!-- Style Exaggeration -->
+                    <div class="form-group">
+                        <label>
+                            Style Exaggeration
+                            <span class="label-value" id="styleValue">0%</span>
+                        </label>
+                        <input type="range" class="range-slider" id="styleSlider" min="0" max="1" step="0.01" value="0">
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Speaker Boost -->
+                    <div class="form-group">
+                        <div class="toggle-row">
+                            <label>Speaker Boost</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="speakerBoostToggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Language Override -->
+                    <div class="form-group">
+                        <div class="toggle-row">
+                            <label>Language Override</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="langOverrideToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <select class="form-select" id="languageSelect" style="display:none;">
+                            <option value="">Auto detect</option>
+                            <option value="vi">Tiếng Việt</option>
+                            <option value="en">English</option>
+                            <option value="ja">日本語</option>
+                            <option value="ko">한국어</option>
+                            <option value="zh">中文</option>
+                            <option value="fr">Français</option>
+                            <option value="de">Deutsch</option>
+                            <option value="es">Español</option>
+                            <option value="pt">Português</option>
+                            <option value="ru">Русский</option>
+                            <option value="ar">العربية</option>
+                            <option value="hi">हिन्दी</option>
+                            <option value="th">ภาษาไทย</option>
+                        </select>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Output Format -->
+                    <div class="form-group">
+                        <label>Output Format</label>
+                        <select class="form-select" id="outputFormatSelect">
+                            <option value="mp3_44100_128">MP3 44.1kHz 128kbps</option>
+                            <option value="mp3_44100_192">MP3 44.1kHz 192kbps</option>
+                            <option value="mp3_44100_64">MP3 44.1kHz 64kbps</option>
+                            <option value="pcm_16000">PCM 16kHz</option>
+                            <option value="pcm_22050">PCM 22.05kHz</option>
+                            <option value="pcm_24000">PCM 24kHz</option>
+                            <option value="pcm_44100">PCM 44.1kHz</option>
+                        </select>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Reset -->
+                    <button class="btn btn-sm" id="btnResetSettings" style="align-self: flex-end;">
+                        🔄 Reset values
+                    </button>
+                </div>
+            </section>
+
+            <!-- ============ Audio Player Panel ============ -->
+            <section class="player-panel glass" id="playerPanel">
+                <div class="player-controls">
+                    <button class="player-btn-play" id="btnPlayerPlay" title="Play/Pause">
+                        ▶
+                    </button>
+                    <div class="player-progress-container">
+                        <div class="player-progress-bar" id="playerProgressBar">
+                            <div class="player-progress-fill" id="playerProgressFill"></div>
+                        </div>
+                        <span class="player-time" id="playerTime">00:00 / 00:00</span>
+                    </div>
+                </div>
+                <div class="player-actions">
+                    <button class="btn btn-sm" id="btnDownloadAll" disabled>
+                        📥 Download All
+                    </button>
+                    <button class="btn btn-sm" id="btnJoinAudio" disabled>
+                        🔗 Join Audio
+                    </button>
+                    <button class="btn btn-sm" id="btnExportSRT" disabled>
+                        📄 Export SRT
+                    </button>
+                    <button class="btn btn-sm" id="btnExportVTT" disabled>
+                        📄 Export VTT
+                    </button>
+                    <button class="btn btn-sm" id="btnClearCache">
+                        🗑️ Clear Cache
+                    </button>
+                </div>
+            </section>
+
+            <!-- ============ Footer Stats ============ -->
+            <footer class="footer-stats glass" id="footerStats">
+                <div class="stat-group">
+                    <div class="stat">
+                        💰 Credits: <span class="stat-highlight" id="footerCredits">--/--</span>
+                    </div>
+                    <div class="stat">
+                        📅 Reset: <span class="stat-highlight" id="footerResetDate">--</span>
+                    </div>
+                </div>
+                <div class="stat-group">
+                    <div class="stat">
+                        🗄️ Cache: <span class="stat-highlight" id="footerCacheCount">0 items</span>
+                    </div>
+                    <div class="stat">
+                        💾 Size: <span class="stat-highlight" id="footerCacheSize">0 MB</span>
+                    </div>
+                    <div class="stat">
+                        ✨ Saved: <span class="stat-highlight" id="footerCharsSaved">0 chars</span>
+                    </div>
+                </div>
+            </footer>
+        </div> <!-- End viewAudio -->
+
+        <!-- ============ PHASE 2: VIDEO ============ -->
+        <div id="viewVideo" style="display: none;">
+            <section class="import-panel glass" style="grid-column: 1 / -1;">
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btnImportVideoAssets">
+                        📁 Chọn MP3 & File TXT Prompts
+                    </button>
+                </div>
+                <div class="batch-controls">
+                    <button class="btn btn-success" id="btnStartVideo" disabled>
+                        ▶ Start Render Video
+                    </button>
+                </div>
+                <input type="file" id="videoAssetsInput" class="hidden-input" accept=".mp3,.txt" multiple>
+            </section>
+
+            <section class="subtitle-panel glass" style="grid-column: 1; min-height: 400px;">
+                <div class="panel-header">
+                    <h3>📋 Timeline Prompts & Hình ảnh</h3>
+                    <div>
+                        <button class="btn btn-sm" id="btnClearVideoList">🗑️ Xóa</button>
+                    </div>
+                </div>
+                <div class="subtitle-list" id="promptList">
+                    <div class="empty-state">
+                        <div class="empty-icon">🎥</div>
+                        <h4>Chưa có dữ liệu Video</h4>
+                        <p>Vui lòng upload 1 file Audio (.mp3) và 1 file Timeline Prompts (.txt)</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="settings-panel glass" style="grid-column: 2;">
+                <div class="panel-header">
+                    <h3>⚙️ Cài đặt Video</h3>
+                </div>
+                <div class="settings-content">
+                    <div class="form-group">
+                        <label>Nguồn tạo ảnh</label>
+                        <select class="form-select" id="imageProviderSelect" style="margin-bottom: 8px;">
+                            <option value="pollinations">Pollinations.ai (Miễn phí 100%, Không cần Key)</option>
+                            <option value="local">Ảnh có sẵn từ máy tính (Folder)</option>
+                            <option value="gemini">Google Gemini API (Cần add thẻ thanh toán)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="geminiKeyGroup" style="display:none;">
+                        <label>Google Gemini API Key</label>
+                        <input type="password" class="form-input" id="geminiApiKey" placeholder="Dán API Key vào đây..." style="padding:8px;">
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Yêu cầu tài khoản Pay-as-you-go.</div>
+                    </div>
+
+                    <div class="form-group" id="localFolderGroup" style="display:none;">
+                        <label>Thư mục ảnh (Đã tải về)</label>
+                        <button class="btn btn-primary" id="btnImportImageFolder" style="width:100%; justify-content:center;">📁 Chọn Folder Ảnh</button>
+                        <input type="file" id="localImageFolderInput" class="hidden-input" webkitdirectory directory multiple accept="image/*">
+                        <input type="file" id="singleImageOverrideInput" class="hidden-input" accept="image/*">
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;" id="localImageStatus">Chưa chọn thư mục nào.</div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="form-group">
+                        <label>Trạng thái FFmpeg</label>
+                        <div id="ffmpegStatus"
+                            style="font-size:0.8rem; color:var(--warning); background:var(--bg-tertiary); padding:8px; border-radius:4px;">
+                            Chưa tải...</div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="form-group">
+                        <label>Kết quả Video</label>
+                        <video id="resultVideoPlayer" controls
+                            style="width:100%; border-radius:8px; display:none; margin-top:10px;"></video>
+                        <button class="btn btn-success" id="btnDownloadVideo"
+                            style="display:none; margin-top:10px; width:100%; justify-content:center;">📥 Tải Video
+                            MP4</button>
+                    </div>
+                </div>
+            </section>
+        </div> <!-- End viewVideo -->
+
+    </main>
+
+    <!-- ============ API Key Modal ============ -->
+    <div class="modal-overlay" id="apiKeyModal">
+        <div class="modal">
+            <h2>🔑 Cấu hình API Key</h2>
+            <p>
+                Nhập API key từ ElevenLabs. Lấy key tại
+                <a href="https://elevenlabs.io" target="_blank" style="color: var(--text-accent);">elevenlabs.io</a>
+                → Profile → API Keys.<br>
+                Key sẽ được lưu trong browser, chỉ cần nhập 1 lần.
+            </p>
+            <input type="password" class="form-input" id="apiKeyInput" placeholder="Dán API key vào đây..."
+                autocomplete="off">
+            <div class="connection-status" id="connectionStatus"></div>
+            <div class="modal-actions">
+                <button class="btn" id="btnModalCancel">Hủy</button>
+                <button class="btn" id="btnTestConnection">🔍 Test</button>
+                <button class="btn btn-primary" id="btnSaveApiKey">💾 Lưu & Kết nối</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ Google API Key Modal ============ -->
+    <div class="modal-overlay" id="googleApiKeyModal">
+        <div class="modal">
+            <h2>☁️ Cấu hình Google Cloud API Key</h2>
+            <p>
+                Nhập API key từ Google Cloud Console (có bật quyền truy cập Cloud Text-to-Speech API).<br>
+                Key sẽ được lưu trong browser.
+            </p>
+            <input type="password" class="form-input" id="googleApiKeyInput"
+                placeholder="Dán API key Google Cloud vào đây..." autocomplete="off">
+            <div class="connection-status" id="googleConnectionStatus"></div>
+            <div class="modal-actions">
+                <button class="btn" id="btnGoogleModalCancel">Hủy</button>
+                <button class="btn btn-primary" id="btnSaveGoogleApiKey">💾 Lưu & Kết nối</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ Text Input Modal ============ -->
+    <div class="modal-overlay" id="textInputModal">
+        <div class="modal" style="max-width: 600px;">
+            <h2>✏️ Nhập văn bản</h2>
+            <p>Mỗi dòng sẽ trở thành một subtitle riêng biệt.</p>
+            <textarea class="text-input-area" id="textInputArea" rows="10"
+                placeholder="Nhập văn bản ở đây...&#10;Mỗi dòng = 1 subtitle"></textarea>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                <span style="font-size: 0.75rem; color: var(--text-muted);" id="textCharCount">0 ký tự</span>
+            </div>
+            <div class="modal-actions">
+                <button class="btn" id="btnTextCancel">Hủy</button>
+                <button class="btn btn-primary" id="btnTextAdd">📋 Thêm vào danh sách</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ Audio element (hidden) ============ -->
+    <audio id="audioPlayer" preload="auto"></audio>
+
+    <!-- FFmpeg.wasm Scripts -->
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+
+    <!-- ============ Scripts ============ -->
+    <script src="js/subtitle-parser.js"></script>
+    <script src="js/text-optimizer.js"></script>
+    <script src="js/cache-manager.js"></script>
+    <script src="js/elevenlabs-api.js"></script>
+    <script src="js/fallback-tts.js"></script>
+    <script src="js/batch-processor.js"></script>
+    <script src="js/audio-merger.js"></script>
+    <script src="js/google-tts-api.js"></script>
+    <script src="js/image-generator.js"></script>
+    <script src="js/video-renderer.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
